@@ -4,6 +4,25 @@ from random import choice, randint, shuffle
 import json
 
 
+# ---------------------------- SEARCH PASSWORD ------------------------------- #
+def find_password():
+    website = site_input.get()
+
+    try:
+        with open("_saved_passwords.json", mode="r") as data_file:
+            data = json.load(data_file)
+    except FileNotFoundError:
+        messagebox.showerror("Error", "No Data File found")
+    else:
+        if website in data:
+            email = data[website]['email']
+            password = data[website]['password']
+            messagebox.showinfo(website, f"Email: {email} \nPassword: {password}")
+        else:
+            messagebox.showerror("Error", f"No details for the {website} exists")
+
+
+
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 def generate_password():
     letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
@@ -17,14 +36,15 @@ def generate_password():
     nr_letters = randint(8, 10)
     nr_symbols = randint(2, 4)
     nr_numbers = randint(2, 4)
-    password_list = [choice(letters) for char in range(nr_letters)]
-    password_list += [choice(symbols) for symbol in range(nr_symbols)]
-    password_list += [choice(numbers) for num in range(nr_numbers)]
+    password_list = [choice(letters) for _ in range(nr_letters)]
+    password_list += [choice(symbols) for _ in range(nr_symbols)]
+    password_list += [choice(numbers) for _ in range(nr_numbers)]
 
     shuffle(password_list)
 
     password = "".join(password_list)
 
+    pass_input.delete(0, END)
     pass_input.insert(0, password)
 
 
@@ -34,12 +54,11 @@ def save():
     username = u_name_input.get()
     pass_word = pass_input.get()
     new_data = {
-        website:{
+        website: {
             "email": username,
             "password": pass_word,
         }
     }
-    
 
     if len(website) == 0 or len(pass_word) == 0:
         messagebox.showerror(title="Oops", message="Please make sure no fields are empty!")
@@ -83,22 +102,24 @@ u_name_label.grid(row=2, column=0)
 pass_label = Label(text="Password:")
 pass_label.grid(row=3, column=0)
 
-site_input = Entry(width=55)
+site_input = Entry(width=35)
 site_input.focus()
-site_input.grid(row=1, column=1, sticky="w", columnspan=2)
+site_input.grid(row=1, column=1, sticky="w")
 
 u_name_input = Entry(width=55)
 u_name_input.insert(0, "ogidiifechukwu@gmail.com")
 u_name_input.grid(row=2, column=1, sticky="w", columnspan=2)
 
 pass_input = Entry(width=35)
-pass_input.grid(row=3, column=1, sticky="w",)
+pass_input.grid(row=3, column=1, sticky="w")
+
+search_bttn = Button(text="Search", width=15, command=find_password)
+search_bttn.grid(row=1, column=2, sticky="w")
 
 pass_gen_bttn = Button(text="Generate Password", width=15, command=generate_password)
 pass_gen_bttn.grid(row=3, column=2, sticky="w")
 
 submit_bttn = Button(text="Add", width=45, command=save)
 submit_bttn.grid(row=4, column=1, sticky="w", columnspan=2)
-
 
 window.mainloop()
